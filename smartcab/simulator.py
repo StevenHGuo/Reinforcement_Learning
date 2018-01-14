@@ -34,7 +34,18 @@ class Simulator(object):
         'gray'    : (155, 155, 155)
     }
 
-    def __init__(self, env, size=None, update_delay=2.0, display=True, log_metrics=True, optimized=False):
+    def __init__(self, env, size=None, update_delay=2.0, display=False, log_metrics=True, optimized=True):
+        """
+        the constructor of Simulator
+        :param env:  
+        :param size: 
+        :param update_delay:  the delay to update the Q-Value
+        :param display:  Wheather open the GUI
+        :param log_metrics: Wheater log the data
+        :param optimized: Wheather optimaized the data on the specified Q-learning
+        """
+
+
         self.env = env
         self.size = size if size is not None else ((self.env.grid_size[0] + 1) * self.env.block_size, (self.env.grid_size[1] + 2) * self.env.block_size)
         self.width, self.height = self.size
@@ -108,7 +119,7 @@ class Simulator(object):
             self.log_writer = csv.DictWriter(self.log_file, fieldnames=self.log_fields)
             self.log_writer.writeheader()
 
-    def run(self, tolerance=0.05, n_test=0):
+    def run(self, tolerance=0.05, n_test=10):
         """ Run a simulation of the environment. 
 
         'tolerance' is the minimum epsilon necessary to begin testing (if enabled)
@@ -121,9 +132,9 @@ class Simulator(object):
         # Get the primary agent
         a = self.env.primary_agent
 
-        total_trials = 1
-        testing = False
-        trial = 1
+        total_trials = 1     # Record the count of trials of simulator
+        testing = False     # The switch controling testing
+        trial = 1            #
 
         while True:
 
@@ -131,10 +142,13 @@ class Simulator(object):
             if not testing:
                 if total_trials > 20: # Must complete minimum 20 training trials
                     if a.learning:
+                        # Leaning Mode
+                        # Verify whether the damping factor reaches the threshold
                         if a.epsilon < tolerance: # assumes epsilon decays to 0
                             testing = True
                             trial = 1
                     else:
+                        # Testing Mode
                         testing = True
                         trial = 1
                         
@@ -158,6 +172,8 @@ class Simulator(object):
             self.current_time = 0.0
             self.last_updated = 0.0
             self.start_time = time.time()
+
+            # Learning Or Testing Period
             while True:
                 try:
                     # Update current time

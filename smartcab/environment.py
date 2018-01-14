@@ -11,6 +11,12 @@ class TrafficLight(object):
     valid_states = [True, False]  # True = NS open; False = EW open
 
     def __init__(self, state=None, period=None):
+        """
+        
+        :param state: The current state of traffic lights.
+        :param period: Control the timing of traffic lights.
+        """
+
         self.state = state if state is not None else random.choice(self.valid_states)
         self.period = period if period is not None else random.choice([2, 3, 4, 5])
         self.last_updated = 0
@@ -27,14 +33,24 @@ class TrafficLight(object):
 class Environment(object):
     """Environment within which all agents operate."""
 
+    # the action which the car can do
     valid_actions = [None, 'forward', 'left', 'right']
+    #
     valid_inputs = {'light': TrafficLight.valid_states, 'oncoming': valid_actions, 'left': valid_actions, 'right': valid_actions}
-    valid_headings = [(1, 0), (0, -1), (-1, 0), (0, 1)]  # E, N, W, S
-    hard_time_limit = -100  # Set a hard time limit even if deadline is not enforced.
+    # the head direction of car, corresponding E, N, W, S
+    valid_headings = [(1, 0), (0, -1), (-1, 0), (0, 1)]
+    # Set a hard time limit even if deadline is not enforced
+    hard_time_limit = -100
 
-    def __init__(self, verbose=True, num_dummies=100, grid_size = (8, 6)):
-        self.num_dummies = num_dummies  # Number of dummy driver agents in the environment
-        self.verbose = verbose # If debug output should be given
+    def __init__(self, verbose=False, num_dummies=100, grid_size = (8, 6)):
+        """
+        :param verbose: If debug output should be given
+        :param num_dummies: Number of dummy driver agents in the environment
+        :param grid_size: The road layout:( columns, rows )
+        """
+
+        self.num_dummies = num_dummies
+        self.verbose = verbose
 
         # Initialize simulation variables
         self.done = False
@@ -95,7 +111,7 @@ class Environment(object):
         self.agent_states[agent] = {'location': random.choice(self.intersections.keys()), 'heading': (0, 1)}
         return agent
 
-    def set_primary_agent(self, agent, enforce_deadline=False):
+    def set_primary_agent(self, agent, enforce_deadline=True):
         """ When called, set_primary_agent sets 'agent' as the primary agent.
             The primary agent is the smartcab that is followed in the environment. """
 
@@ -193,6 +209,7 @@ class Environment(object):
         if self.primary_agent is not None:
             self.primary_agent.update()
 
+        # Update the Dummy Agent
         for agent in self.agent_states.iterkeys():
             if agent is not self.primary_agent:
                 agent.update()
@@ -220,8 +237,11 @@ class Environment(object):
         self.t += 1
 
     def sense(self, agent):
-        """ This function is called when information is requested about the sensor
-            inputs from an 'agent' in the environment. """
+        """ 
+            This function is called when information is requested about the sensor
+            inputs from an 'agent' in the environment. 
+            Get Oncoming, Left, Right.
+        """
 
         assert agent in self.agent_states, "Unknown agent!"
 
