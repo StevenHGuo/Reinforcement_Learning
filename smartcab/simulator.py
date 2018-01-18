@@ -34,10 +34,11 @@ class Simulator(object):
         'gray'    : (155, 155, 155)
     }
 
-    def __init__(self, env, size=None, update_delay=2.0, display=False, log_metrics=True, optimized=True):
+    def __init__(self, env, prime_agent, size=None, update_delay=2.0, display=False, log_metrics=True, optimized=True):
         """
         the constructor of Simulator
         :param env:  
+        :param prime_agent: the learning agent
         :param size: 
         :param update_delay:  the delay to update the Q-Value
         :param display:  Wheather open the GUI
@@ -45,8 +46,8 @@ class Simulator(object):
         :param optimized: Wheather optimaized the data on the specified Q-learning
         """
 
-
         self.env = env
+        self.prime_agent = prime_agent
         self.size = size if size is not None else ((self.env.grid_size[0] + 1) * self.env.block_size, (self.env.grid_size[1] + 2) * self.env.block_size)
         self.width, self.height = self.size
         self.road_width = 44
@@ -104,8 +105,12 @@ class Simulator(object):
             # Set log files
             if a.learning:
                 if self.optimized: # Whether the user is optimizing the parameters and decay functions
-                    self.log_filename = os.path.join("logs", "sim_improved-learning" + str(time.time()) + ".csv")
-                    self.table_filename = os.path.join("logs","sim_improved-learning" + str(time.time()) + ".txt")
+                    filename = "sim_improved-learning-epsilon{}-alpha{}-a{}-formula{}-state_space{}-n_test{}-tolerance{}".format(
+                                    self.prime_agent.epsilon, self.prime_agent.alpha, self.prime_agent.a,
+                                    self.prime_agent.formula, 1 if self.prime_agent.state_space else 0,
+                                    self.prime_agent.n_test, str(self.prime_agent.tolerance))
+                    self.log_filename = os.path.join("logs", filename + ".csv")
+                    self.table_filename = os.path.join("logs",filename + ".txt")
                 else: 
                     self.log_filename = os.path.join("logs", "sim_default-learning.csv")
                     self.table_filename = os.path.join("logs","sim_default-learning.txt")
@@ -254,7 +259,8 @@ class Simulator(object):
                     f.write("{}\n".format(state))
                     for action, reward in a.Q[state].iteritems():
                         f.write(" -- {} : {:.2f}\n".format(action, reward))
-                    f.write("\n")  
+                        f.write("\n")
+
                 self.table_file.close()
 
             self.log_file.close()
