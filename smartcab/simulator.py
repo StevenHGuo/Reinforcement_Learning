@@ -105,7 +105,7 @@ class Simulator(object):
             # Set log files
             if a.learning:
                 if self.optimized: # Whether the user is optimizing the parameters and decay functions
-                    filename = "sim_improved-learning-epsilon{}-alpha{}-a{}-formula{}-state_space{}-n_test{}-tolerance{}".format(
+                    filename = "sim_improved_learning_{}_{}_{}_{}_{}_{}_{}".format(
                                     self.prime_agent.epsilon, self.prime_agent.alpha, self.prime_agent.a,
                                     self.prime_agent.formula, 1 if self.prime_agent.state_space else 0,
                                     self.prime_agent.n_test, str(self.prime_agent.tolerance))
