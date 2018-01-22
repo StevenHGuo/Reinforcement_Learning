@@ -168,17 +168,17 @@ class LearningAgent(Agent):
 
 def run():
     # Calculate Parameter
-    n_test = 1000
+    n_test = 10000
     tolerance = 0.0001
     epsilon = 1
     alpha = 0.5
     formula = 3
     state_space = True
-    a = 0.0004
+    a = 0.00051
 
     # Logic Parameter
     learning = True
-    update_delay = 0.01
+    update_delay = 0.000001
     verbose = True
     enforce_deadline = True
     display = False
